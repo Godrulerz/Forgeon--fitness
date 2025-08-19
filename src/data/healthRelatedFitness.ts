@@ -221,7 +221,7 @@ export const healthRelatedFitnessModule: HealthRelatedModule = {
           equipmentRequired: ['Cones', 'Audio System', '40m Space'],
           instructions: 'Run 30m shuttles with 15s active recovery. Speed increases progressively. Record final speed.',
           hasTimer: true,
-          hasAudio: true,
+          //hasAudio: true,
           dataFields: [
             { id: 'final_speed', name: 'Final Speed', type: 'number', unit: 'km/h', required: true, min: 8, max: 24 },
             { id: 'total_distance', name: 'Total Distance', type: 'number', unit: 'm', required: true },
