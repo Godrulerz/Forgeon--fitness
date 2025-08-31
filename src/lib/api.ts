@@ -1,5 +1,6 @@
 // src/lib/api.ts
-export const API_URL = import.meta.env.VITE_API_URL;
+const configuredApiUrl = import.meta.env.VITE_API_URL as string | undefined;
+export const API_URL = configuredApiUrl ? configuredApiUrl.replace(/\/$/, '') : '';
 
 export async function createAssessment(payload: {
   userId: string;

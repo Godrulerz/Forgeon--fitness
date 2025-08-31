@@ -11,9 +11,10 @@ export default defineConfig({
     port: 5173, // optional, sets frontend port
     proxy: {
       '/api': {
-        target: 'http://localhost:5000', // your backend URL
+        target: 'http://localhost:3000', // backend URL from Forgeon
         changeOrigin: true,
         secure: false,
+        
       },
     },
   },

@@ -265,6 +265,11 @@ const TestCard: React.FC<{
 export const HealthRelatedFitnessView: React.FC<HealthRelatedFitnessViewProps> = ({ onBack }) => {
   const [selectedSubModule, setSelectedSubModule] = useState<SubModule | null>(null);
   const [selectedTest, setSelectedTest] = useState<FitnessTest | null>(null);
+  // Cooper test quick evaluation state
+  const [cooperDistance, setCooperDistance] = useState<string>('');
+  const [cooperResult, setCooperResult] = useState<{ vo2max: number; category: string } | null>(null);
+  const [cooperLoading, setCooperLoading] = useState<boolean>(false);
+  const [cooperError, setCooperError] = useState<string | null>(null);
 
   const handleSubModuleSelect = (subModule: SubModule) => {
     setSelectedSubModule(subModule);
@@ -475,7 +480,8 @@ export const HealthRelatedFitnessView: React.FC<HealthRelatedFitnessViewProps> =
           </div>
         </div>
 
-        {/* Data Entry Form */}
+        {/* Data Entry Form */
+        }
         <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-semibold text-gray-900">Data Entry Form</h3>
@@ -621,6 +627,81 @@ export const HealthRelatedFitnessView: React.FC<HealthRelatedFitnessViewProps> =
             </div>
           </div>
         </div>
+
+        {/* Cooper Test Quick Evaluation */}
+        {selectedTest.id === 'cooper-12min' && (
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-blue-200">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                <Calculator className="w-5 h-5 text-blue-600" />
+                Cooper Test Evaluation
+              </h3>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Distance (m)</label>
+                <input
+                  type="number"
+                  min={0}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="e.g., 2600"
+                  value={cooperDistance}
+                  onChange={(e) => setCooperDistance(e.target.value)}
+                />
+              </div>
+              <div className="flex gap-3">
+                <button
+                  onClick={async () => {
+                    setCooperError(null);
+                    setCooperResult(null);
+                    setCooperLoading(true);
+                    try {
+                      const res = await fetch('/api/fitness/health/tests/cooper/evaluate', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ distance: Number(cooperDistance) })
+                      });
+                      if (!res.ok) throw new Error(`Request failed: ${res.status}`);
+                      const json = await res.json();
+                      const vo2 = json?.data?.results?.estimated_vo2max;
+                      const cat = json?.data?.results?.category;
+                      setCooperResult({ vo2max: vo2, category: cat });
+                    } catch (err: any) {
+                      setCooperError(err?.message || 'Failed to evaluate');
+                    } finally {
+                      setCooperLoading(false);
+                    }
+                  }}
+                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-60"
+                  disabled={cooperLoading || !cooperDistance}
+                >
+                  {cooperLoading ? 'Calculating...' : 'Calculate VO₂max'}
+                </button>
+                <button
+                  onClick={() => { setCooperDistance(''); setCooperResult(null); setCooperError(null); }}
+                  className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-white transition-colors"
+                >
+                  Reset
+                </button>
+              </div>
+            </div>
+            {cooperError && (
+              <p className="mt-4 text-sm text-red-600">{cooperError}</p>
+            )}
+            {cooperResult && (
+              <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="p-4 rounded-lg bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100">
+                  <p className="text-sm text-blue-800">Estimated VO₂max</p>
+                  <p className="text-2xl font-bold text-blue-900">{cooperResult.vo2max} ml/kg/min</p>
+                </div>
+                <div className="p-4 rounded-lg bg-gradient-to-r from-green-50 to-emerald-50 border border-green-100">
+                  <p className="text-sm text-emerald-800">Category</p>
+                  <p className="text-2xl font-bold text-emerald-900 capitalize">{cooperResult.category.replaceAll('_', ' ')}</p>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     );
   }

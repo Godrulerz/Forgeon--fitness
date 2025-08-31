@@ -42,7 +42,15 @@ const StatCard: React.FC<{
   );
 };
 
-export const Dashboard: React.FC = () => {
+type Theme = 'light' | 'dark';
+type UserRole = 'athlete' | 'coach';
+
+interface DashboardProps {
+  userRole: UserRole;
+  theme: Theme;
+}
+
+export const Dashboard: React.FC<DashboardProps> = ({ userRole, theme }) => {
   const upcomingTests = [
     { athlete: 'Alex Rodriguez', test: 'VO₂max Test', time: '10:00 AM', status: 'scheduled' },
     { athlete: 'Emma Johnson', test: 'Wingate Test', time: '2:00 PM', status: 'in_progress' },
@@ -57,22 +65,40 @@ export const Dashboard: React.FC = () => {
   ];
 
   return (
-    <div className="space-y-6">
+    <div className={`space-y-6 transition-colors duration-300 ${
+      theme === 'light' ? 'text-gray-900' : 'text-gray-100'
+    }`}>
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <div className="flex items-center space-x-3">
-            <h2 className="text-2xl font-bold text-gray-900">Dashboard</h2>
-            <Tooltip content="Overview of your fitness assessment platform activity and key metrics" />
+            <h2 className={`text-2xl font-bold transition-colors duration-300 ${
+              theme === 'light' ? 'text-gray-900' : 'text-white'
+            }`}>
+              {userRole === 'coach' ? 'Coach Dashboard' : 'Athlete Dashboard'}
+            </h2>
+            <Tooltip content={`Overview of your fitness assessment platform activity and key metrics as a ${userRole}`} />
           </div>
-          <p className="text-gray-600 mt-1">Welcome back! Here's your assessment overview.</p>
+          <p className={`transition-colors duration-300 ${
+            theme === 'light' ? 'text-gray-600' : 'text-gray-300'
+          }`}>
+            Welcome back! Here's your {userRole === 'coach' ? 'coaching' : 'training'} overview.
+          </p>
         </div>
         <div className="flex items-center space-x-3">
-          <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-            Schedule Test
+          <button className={`px-4 py-2 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+            theme === 'light' 
+              ? 'bg-blue-600 text-white hover:bg-blue-700' 
+              : 'bg-blue-500 text-white hover:bg-blue-600'
+          }`}>
+            {userRole === 'coach' ? 'Schedule Test' : 'Book Session'}
           </button>
-          <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-            Generate Report
+          <button className={`px-4 py-2 border rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+            theme === 'light' 
+              ? 'border-gray-300 hover:bg-gray-50' 
+              : 'border-gray-600 hover:bg-gray-800'
+          }`}>
+            {userRole === 'coach' ? 'Generate Report' : 'View Progress'}
           </button>
         </div>
       </div>

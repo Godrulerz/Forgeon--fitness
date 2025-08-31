@@ -5,15 +5,18 @@ type AssessmentStep = 'start' | 'workflow';
 
 interface AssessmentManagerProps {
   moduleId?: string;
+  testProgramId?: string;
   onBack: () => void;
 }
 
 export const AssessmentManager: React.FC<AssessmentManagerProps> = ({
   moduleId,
+  testProgramId,
   onBack
 }) => {
   const [currentStep, setCurrentStep] = useState<AssessmentStep>('start');
   const [selectedModuleId, setSelectedModuleId] = useState<string | null>(moduleId || null);
+  const [selectedProgramId, setSelectedProgramId] = useState<string | null>(testProgramId || null);
   const [selectedAthleteId, setSelectedAthleteId] = useState<string | null>(null);
 
   const handleStartAssessment = (moduleId: string, athleteId: string) => {
